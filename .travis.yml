@@ -38,16 +38,6 @@ matrix:
       env:
         - DEPS=latest
         - TEST_COVERAGE=true
-    - php: 7
-      env:
-        - DEPS=lowest
-    - php: 7
-      env:
-        - DEPS=locked
-        - CHECK_CS=true
-    - php: 7
-      env:
-        - DEPS=latest
     - php: hhvm
       env:
         - DEPS=lowest
