@@ -18,8 +18,6 @@ services:
 
 env:
   global:
-    - TESTS_ZEND_CACHE_MEMCACHED_HOST="127.0.0.1"
-    - TESTS_ZEND_CACHE_MEMCACHED_PORT=11211
     - SITE_URL="https://zendframework.github.io/zend-cache-mongo"
     - GH_USER_NAME="Matthew Weier O'Phinney"
     - GH_USER_EMAIL="matthew@weierophinney.net"
