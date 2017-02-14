@@ -38,17 +38,6 @@ matrix:
       env:
         - DEPS=latest
         - TEST_COVERAGE=true
-    - php: hhvm
-      env:
-        - DEPS=lowest
-    - php: hhvm
-      env:
-        - DEPS=locked
-    - php: hhvm
-      env:
-        - DEPS=latest
-  allow_failures:
-    - php: hhvm
 
 notifications:
   irc: "irc.freenode.org#zftalk.dev"
