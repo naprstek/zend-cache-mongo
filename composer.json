@@ -1,0 +1,52 @@
+{
+    "name": "marc-mabe/zend-cache-mongo",
+    "description": "Mongo adapter for zend-cache",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "zf2",
+        "cache"
+    ],
+    "homepage": "https://github.com/marc-mabe/zend-cache-mongo",
+    "autoload": {
+        "psr-4": {
+            "Zend\\Cache\\Storage\\Adapter\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^5.6 || ^7.0",
+        "marc-mabe/zend-cache": "^3.0",
+        "ext-mongo": ">=1"
+    },
+    "require-dev": {
+        "marc-mabe/zend-cache-test": "^3.0",
+        "zendframework/zend-coding-standard": "~1.0.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.0-dev",
+            "dev-develop": "3.1-dev"
+        },
+        "zf": {
+            "component": "Zend\\Cache\\Storage\\Adapter\\Mongo",
+            "config-provider": "Zend\\Cache\\Storage\\Adapter\\Mongo"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ZendTest\\Cache\\Storage\\Adapter\\": "test/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
+        "upload-coverage": "coveralls -v"
+    }
+}
