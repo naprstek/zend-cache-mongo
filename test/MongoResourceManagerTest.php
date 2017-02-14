@@ -9,6 +9,7 @@
 
 namespace ZendTest\Cache\Storage\Adapter;
 
+use MongoClient;
 use Zend\Cache\Storage\Adapter\MongoResourceManager;
 
 /**
@@ -33,8 +34,7 @@ class MongoResourceManagerTest extends \PHPUnit_Framework_TestCase
 
         $id = 'foo';
 
-        $clientClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? '\Mongo' : '\MongoClient';
-        $client = new $clientClass(getenv('TESTS_ZEND_CACHE_MONGO_CONNECTSTRING'));
+        $client = new MongoClient(getenv('TESTS_ZEND_CACHE_MONGO_CONNECTSTRING'));
         $resource = $client->selectCollection(
             getenv('TESTS_ZEND_CACHE_MONGO_DATABASE'),
             getenv('TESTS_ZEND_CACHE_MONGO_COLLECTION')
@@ -96,8 +96,7 @@ class MongoResourceManagerTest extends \PHPUnit_Framework_TestCase
     {
         $id = 'foo';
 
-        $clientClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? '\Mongo' : '\MongoClient';
-        $client = new $clientClass(getenv('TESTS_ZEND_CACHE_MONGO_CONNECTSTRING'));
+        $client = new MongoClient(getenv('TESTS_ZEND_CACHE_MONGO_CONNECTSTRING'));
         $resource = $client->selectCollection(
             getenv('TESTS_ZEND_CACHE_MONGO_DATABASE'),
             getenv('TESTS_ZEND_CACHE_MONGO_COLLECTION')

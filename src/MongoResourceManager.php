@@ -11,6 +11,7 @@ namespace Zend\Cache\Storage\Adapter;
 
 use MongoCollection;
 use MongoException;
+use MongoClient;
 use Zend\Cache\Exception;
 
 class MongoResourceManager
@@ -86,8 +87,7 @@ class MongoResourceManager
             try {
                 if (! isset($resource['db_instance'])) {
                     if (! isset($resource['client_instance'])) {
-                        $clientClass = version_compare(phpversion('mongo'), '1.3.0', '<') ? 'Mongo' : 'MongoClient';
-                        $resource['client_instance'] = new $clientClass(
+                        $resource['client_instance'] = new MongoClient(
                             isset($resource['server']) ? $resource['server'] : null,
                             isset($resource['connection_options']) ? $resource['connection_options'] : [],
                             isset($resource['driver_options']) ? $resource['driver_options'] : []
