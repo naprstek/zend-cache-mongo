@@ -12,7 +12,6 @@ namespace ZendTest\Cache\Psr;
 use Cache\IntegrationTests\CachePoolTest;
 use Zend\Cache\Psr\CacheItemPoolAdapter;
 use Zend\Cache\Storage\Adapter\Mongo;
-use Zend\Cache\StorageFactory;
 use Zend\Cache\Exception;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 
@@ -52,7 +51,7 @@ class MongoPsrIntegrationTest extends CachePoolTest
     public function createCachePool()
     {
         try {
-            $storage = StorageFactory::adapterFactory('mongo', [
+            $storage = new Mongo([
                 'server'     => getenv('TESTS_ZEND_CACHE_MONGO_CONNECTSTRING'),
                 'database'   => getenv('TESTS_ZEND_CACHE_MONGO_DATABASE'),
                 'collection' => getenv('TESTS_ZEND_CACHE_MONGO_COLLECTION'),
