@@ -48,10 +48,10 @@ before_install:
   - if [[ $TRAVIS_PHP_VERSION != 'hhvm' ]]; then phpenv config-add .ci/mongo.ini ; fi
 
 install:
-  - if [[ $DEPS == 'latest' ]]; then travis_retry composer update $COMPOSER_ARGS ; fi
-  - if [[ $DEPS == 'lowest' ]]; then travis_retry composer update --prefer-lowest --prefer-stable $COMPOSER_ARGS ; fi
-  - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry composer require --dev $COMPOSER_ARGS satooshi/php-coveralls:^1.0 ; fi
-  - travis_retry composer install $COMPOSER_ARGS
+  - if [[ $DEPS == 'latest' ]]; then travis_retry composer update ; fi
+  - if [[ $DEPS == 'lowest' ]]; then travis_retry composer update --prefer-lowest --prefer-stable ; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry composer require --dev satooshi/php-coveralls:^1.0 ; fi
+  - travis_retry composer install
   - composer show
 
 script:
