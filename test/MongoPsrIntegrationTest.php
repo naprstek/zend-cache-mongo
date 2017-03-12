@@ -7,14 +7,18 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace ZendTest\Cache\Psr;
+namespace ZendTest\Cache\Mongo;
 
 use Cache\IntegrationTests\CachePoolTest;
 use Zend\Cache\Psr\CacheItemPoolAdapter;
-use Zend\Cache\Storage\Adapter\Mongo;
+use Zend\Cache\Mongo\MongoAdapter;
 use Zend\Cache\Exception;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 
+/**
+ * @group  Zend_Cache_Mongo
+ * @covers Zend\Cache\Mongo\MongoAdapter
+ */
 class MongoPsrIntegrationTest extends CachePoolTest
 {
     /**
@@ -24,7 +28,7 @@ class MongoPsrIntegrationTest extends CachePoolTest
     private $tz;
 
     /**
-     * @var Mongo
+     * @var MongoAdapter
      */
     private $storage;
 
@@ -51,7 +55,7 @@ class MongoPsrIntegrationTest extends CachePoolTest
     public function createCachePool()
     {
         try {
-            $storage = new Mongo([
+            $storage = new MongoAdapter([
                 'server'     => getenv('TESTS_ZEND_CACHE_MONGO_CONNECTSTRING'),
                 'database'   => getenv('TESTS_ZEND_CACHE_MONGO_DATABASE'),
                 'collection' => getenv('TESTS_ZEND_CACHE_MONGO_COLLECTION'),

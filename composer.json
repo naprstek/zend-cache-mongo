@@ -9,7 +9,7 @@
     "homepage": "https://github.com/marc-mabe/zend-cache-mongo",
     "autoload": {
         "psr-4": {
-            "Zend\\Cache\\Storage\\Adapter\\": "src/"
+            "Zend\\Cache\\Mongo\\": "src/"
         }
     },
     "require": {
@@ -29,13 +29,12 @@
             "dev-develop": "3.1-dev"
         },
         "zf": {
-            "component": "Zend\\Cache\\Storage\\Adapter\\Mongo",
-            "config-provider": "Zend\\Cache\\Storage\\Adapter\\Mongo"
+            "component": "Zend\\Cache\\Mongo"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ZendTest\\Cache\\Storage\\Adapter\\": "test/"
+            "ZendTest\\Cache\\Mongo\\": "test/"
         }
     },
     "scripts": {
@@ -45,8 +44,6 @@
         ],
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
-        "test": "phpunit --colors=always",
-        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
-        "upload-coverage": "coveralls -v -x clover.xml"
+        "test": "phpunit"
     }
 }

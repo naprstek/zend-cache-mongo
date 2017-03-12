@@ -7,7 +7,7 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Zend\Cache\Storage\Adapter;
+namespace Zend\Cache\Mongo;
 
 use MongoCollection;
 use MongoException;

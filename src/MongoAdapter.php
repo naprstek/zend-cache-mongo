@@ -7,17 +7,18 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Zend\Cache\Storage\Adapter;
+namespace Zend\Cache\Mongo;
 
-use MongoCollection as MongoResource;
+use MongoCollection;
 use MongoDate;
-use MongoException as MongoResourceException;
+use MongoException;
 use stdClass;
 use Zend\Cache\Exception;
+use Zend\Cache\Storage\Adapter\AbstractAdapter;
 use Zend\Cache\Storage\Capabilities;
 use Zend\Cache\Storage\FlushableInterface;
 
-class Mongo extends AbstractAdapter implements FlushableInterface
+class MongoAdapter extends AbstractAdapter implements FlushableInterface
 {
     /**
      * Has this instance be initialized
@@ -69,9 +70,9 @@ class Mongo extends AbstractAdapter implements FlushableInterface
     /**
      * get mongo resource
      *
-     * @return MongoResource
+     * @return MongoCollection
      */
-    private function getMongoResource()
+    private function getMongoCollection()
     {
         if (! $this->initialized) {
             $options = $this->getOptions();
@@ -116,7 +117,7 @@ class Mongo extends AbstractAdapter implements FlushableInterface
         $success = false;
 
         if (null === $result) {
-            return;
+            return null;
         }
 
         if (isset($result['expires'])) {
@@ -132,7 +133,7 @@ class Mongo extends AbstractAdapter implements FlushableInterface
 
             if ($result['expires']->sec < time()) {
                 $this->internalRemoveItem($normalizedKey);
-                return;
+                return null;
             }
         }
 
@@ -145,7 +146,6 @@ class Mongo extends AbstractAdapter implements FlushableInterface
         }
 
         $success = true;
-
         return $casToken = $result['value'];
     }
 
@@ -156,9 +156,9 @@ class Mongo extends AbstractAdapter implements FlushableInterface
      */
     protected function internalSetItem(& $normalizedKey, & $value)
     {
-        $mongo     = $this->getMongoResource();
+        $mongo     = $this->getMongoCollection();
         $key       = $this->namespacePrefix . $normalizedKey;
-        $ttl       = $this->getOptions()->getTTl();
+        $ttl       = $this->getOptions()->getTtl();
         $expires   = null;
         $cacheItem = [
             'key' => $key,
@@ -175,7 +175,7 @@ class Mongo extends AbstractAdapter implements FlushableInterface
             $mongo->remove(['key' => $key]);
 
             $result = $mongo->insert($cacheItem);
-        } catch (MongoResourceException $e) {
+        } catch (MongoException $e) {
             throw new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -190,8 +190,8 @@ class Mongo extends AbstractAdapter implements FlushableInterface
     protected function internalRemoveItem(& $normalizedKey)
     {
         try {
-            $result = $this->getMongoResource()->remove(['key' => $this->namespacePrefix . $normalizedKey]);
-        } catch (MongoResourceException $e) {
+            $result = $this->getMongoCollection()->remove(['key' => $this->namespacePrefix . $normalizedKey]);
+        } catch (MongoException $e) {
             throw new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -205,7 +205,7 @@ class Mongo extends AbstractAdapter implements FlushableInterface
      */
     public function flush()
     {
-        $result = $this->getMongoResource()->drop();
+        $result = $this->getMongoCollection()->drop();
 
         return ((double) 1) === $result['ok'];
     }
@@ -268,8 +268,8 @@ class Mongo extends AbstractAdapter implements FlushableInterface
     private function fetchFromCollection(& $normalizedKey)
     {
         try {
-            return $this->getMongoResource()->findOne(['key' => $this->namespacePrefix . $normalizedKey]);
-        } catch (MongoResourceException $e) {
+            return $this->getMongoCollection()->findOne(['key' => $this->namespacePrefix . $normalizedKey]);
+        } catch (MongoException $e) {
             throw new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
     }

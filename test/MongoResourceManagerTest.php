@@ -7,16 +7,18 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace ZendTest\Cache\Storage\Adapter;
+namespace ZendTest\Mongo;
 
 use MongoClient;
-use Zend\Cache\Storage\Adapter\MongoResourceManager;
+use PHPUnit\Framework\TestCase;
+use Zend\Cache\Exception;
+use Zend\Cache\Mongo\MongoResourceManager;
 
 /**
- * @group      Zend_Cache
- * @covers Zend\Cache\Storage\Adapter\MongoResourceManager
+ * @group  Zend_Cache_Mongo
+ * @covers Zend\Cache\Mongo\MongoResourceManager
  */
-class MongoResourceManagerTest extends \PHPUnit_Framework_TestCase
+class MongoResourceManagerTest extends TestCase
 {
     /**
      * @var MongoResourceManager
@@ -59,11 +61,8 @@ class MongoResourceManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSetResourceThrowsException()
     {
-        $id = 'foo';
-        $resource = new \stdClass();
-
-        $this->setExpectedException('Zend\Cache\Exception\InvalidArgumentException');
-        $this->object->setResource($id, $resource);
+        $this->expectException(Exception\InvalidArgumentException::class);
+        $this->object->setResource('foo', $this);
     }
 
     public function testHasResourceEmpty()
@@ -88,7 +87,7 @@ class MongoResourceManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->object->hasResource($id));
 
-        $this->setExpectedException('Zend\Cache\Exception\RuntimeException');
+        $this->expectException(Exception\RuntimeException::class);
         $this->object->getResource($id);
     }
 
@@ -136,7 +135,7 @@ class MongoResourceManagerTest extends \PHPUnit_Framework_TestCase
         $this->object->setDatabase($id, $database);
         $this->object->setCollection($id, $collection);
 
-        $this->setExpectedException('Zend\Cache\Exception\RuntimeException');
+        $this->expectException(Exception\RuntimeException::class);
         $this->object->getResource($id);
     }
 

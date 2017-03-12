@@ -29,9 +29,7 @@ matrix:
     - php: 5.6
       env:
         - DEPS=lowest
-    - php: 5.6
-      env:
-        - DEPS=locked
+        - CHECK_CS=true
         #- DEPLOY_DOCS="$(if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST == 'false' ]]; then echo -n 'true' ; else echo -n 'false' ; fi)"
         #- PATH="$HOME/.local/bin:$PATH"
     - php: 5.6
@@ -55,12 +53,18 @@ install:
   - composer show
 
 script:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then composer run-script test-coverage --timeout=400 -- --verbose ; else composer run-script test --timeout=300 -- --verbose ; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then
+        composer run-script test -- --colors=always --coverage-clover clover.xml ;
+    else
+        composer run-script test -- --colors=always ;
+    fi
   - if [[ $CHECK_CS == 'true' ]]; then composer cs-check ; fi
-  - if [[ $DEPLOY_DOCS == "true" && "$TRAVIS_TEST_RESULT" == "0" ]]; then travis_retry curl -sSL https://raw.githubusercontent.com/zendframework/zf-mkdoc-theme/master/theme-installer.sh | bash ; fi
+  - if [[ $DEPLOY_DOCS == "true" && "$TRAVIS_TEST_RESULT" == "0" ]]; then
+        travis_retry curl -sSL https://raw.githubusercontent.com/zendframework/zf-mkdoc-theme/master/theme-installer.sh | bash ;
+    fi
 
 after_script:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry composer upload-coverage ; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry ./vendor/bin/coveralls -v -x clover.xml ; fi
 
 after_success:
   - if [[ $DEPLOY_DOCS == "true" ]]; then ./zf-mkdoc-theme/deploy.sh ; fi

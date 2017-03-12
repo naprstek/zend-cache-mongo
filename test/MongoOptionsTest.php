@@ -7,17 +7,21 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace ZendTest\Cache\Storage\Adapter;
+namespace ZendTest\Cache\Mongo;
 
-use Zend\Cache\Storage\Adapter\MongoOptions;
-use Zend\Cache\Storage\Adapter\MongoResourceManager;
+use PHPUnit\Framework\TestCase;
+use Zend\Cache\Mongo\MongoOptions;
+use Zend\Cache\Mongo\MongoResourceManager;
 
 /**
- * @group      Zend_Cache
- * @covers Zend\Cache\Storage\Adapter\MongoOptions<extended>
+ * @group  Zend_Cache_Mongo
+ * @covers Zend\Cache\Mongo\MongoOptions
  */
-class MongoOptionsTest extends \PHPUnit_Framework_TestCase
+class MongoOptionsTest extends TestCase
 {
+    /**
+     * @var MongoOptions
+     */
     protected $object;
 
     public function setUp()
@@ -60,10 +64,7 @@ class MongoOptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testGetResourceManager()
     {
-        $this->assertInstanceOf(
-            '\Zend\Cache\Storage\Adapter\MongoResourceManager',
-            $this->object->getResourceManager()
-        );
+        $this->assertInstanceOf(MongoResourceManager::class, $this->object->getResourceManager());
 
         $resourceManager = new MongoResourceManager();
 

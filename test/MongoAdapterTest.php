@@ -7,57 +7,60 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace ZendTest\Cache\Storage\Adapter;
+namespace ZendTest\Cache\Mongo;
 
-use Zend\Cache\Storage\Adapter\Mongo;
-use Zend\Cache\Storage\Adapter\MongoOptions;
+use Zend\Cache\Mongo\MongoAdapter;
+use Zend\Cache\Mongo\MongoOptions;
+use ZendTest\Cache\Storage\Adapter\CommonAdapterTest;
 
 /**
- * @group      Zend_Cache
- * @covers Zend\Cache\Storage\Adapter\Mongo<extended>
+ * @group  Zend_Cache_Mongo
+ * @covers Zend\Cache\Mongo\MongoAdapter
  */
 class MongoTest extends CommonAdapterTest
 {
+    /**
+     * @var MongoAdapter
+     */
+    protected $storage;
+
+    /**
+     * @var MongoOptions
+     */
+    protected $options;
+
     public function setUp()
     {
-        $this->_options = new MongoOptions([
+        $this->options = new MongoOptions([
             'server'     => getenv('TESTS_ZEND_CACHE_MONGO_CONNECTSTRING'),
             'database'   => getenv('TESTS_ZEND_CACHE_MONGO_DATABASE'),
             'collection' => getenv('TESTS_ZEND_CACHE_MONGO_COLLECTION'),
         ]);
 
-        $this->_storage = new Mongo();
-        $this->_storage->setOptions($this->_options);
-        $this->_storage->flush();
+        $this->storage = new MongoAdapter();
+        $this->storage->setOptions($this->options);
+        $this->storage->flush();
 
         parent::setUp();
     }
 
     public function tearDown()
     {
-        if ($this->_storage) {
-            $this->_storage->flush();
+        if ($this->storage) {
+            $this->storage->flush();
         }
 
         parent::tearDown();
     }
 
-    public function getCommonAdapterNamesProvider()
-    {
-        return [
-            ['mongo'],
-            ['Mongo'],
-        ];
-    }
-
     public function testSetOptionsNotMongoOptions()
     {
-        $this->_storage->setOptions([
+        $this->storage->setOptions([
             'server'     => getenv('TESTS_ZEND_CACHE_MONGO_CONNECTSTRING'),
             'database'   => getenv('TESTS_ZEND_CACHE_MONGO_DATABASE'),
             'collection' => getenv('TESTS_ZEND_CACHE_MONGO_COLLECTION'),
         ]);
 
-        $this->assertInstanceOf('\Zend\Cache\Storage\Adapter\MongoOptions', $this->_storage->getOptions());
+        $this->assertInstanceOf(MongoOptions::class, $this->storage->getOptions());
     }
 }
