@@ -9,9 +9,9 @@
 
 namespace Zend\Cache\Mongo;
 
-use MongoCollection;
-use MongoException;
-use MongoClient;
+use MongoDB\Client as MongoClient;
+use MongoDB\Collection as MongoCollection;
+use MongoDB\Exception\Exception as MongoException;
 use Zend\Cache\Exception;
 
 class MongoResourceManager
@@ -49,9 +49,8 @@ class MongoResourceManager
     {
         if ($resource instanceof MongoCollection) {
             $this->resources[$id] = [
-                'db'                  => (string) $resource->db,
-                'db_instance'         => $resource->db,
-                'collection'          => (string) $resource,
+                'db'                  => $resource->getDatabaseName(),
+                'collection'          => $resource->getCollectionName(),
                 'collection_instance' => $resource,
             ];
             return $this;
@@ -85,24 +84,16 @@ class MongoResourceManager
         $resource = $this->resources[$id];
         if (! isset($resource['collection_instance'])) {
             try {
-                if (! isset($resource['db_instance'])) {
-                    if (! isset($resource['client_instance'])) {
-                        $resource['client_instance'] = new MongoClient(
-                            isset($resource['server']) ? $resource['server'] : null,
-                            isset($resource['connection_options']) ? $resource['connection_options'] : [],
-                            isset($resource['driver_options']) ? $resource['driver_options'] : []
-                        );
-                    }
-
-                    $resource['db_instance'] = $resource['client_instance']->selectDB(
-                        isset($resource['db']) ? $resource['db'] : ''
-                    );
-                }
-
-                $collection = $resource['db_instance']->selectCollection(
-                    isset($resource['collection']) ? $resource['collection'] : ''
+                $resource['client_instance'] = new MongoClient(
+                    isset($resource['server']) ? $resource['server'] : null,
+                    isset($resource['connection_options']) ? $resource['connection_options'] : [],
+                    isset($resource['driver_options']) ? $resource['driver_options'] : []
                 );
-                $collection->ensureIndex(['key' => 1]);
+                $collection = $resource['client_instance']->selectCollection(
+                    isset($resource['db']) ? $resource['db'] : 'zend',
+                    isset($resource['collection']) ? $resource['collection'] : 'cache'
+                );
+                $collection->createIndex(['key' => 1]);
 
                 $this->resources[$id]['collection_instance'] = $collection;
             } catch (MongoException $e) {
@@ -118,7 +109,6 @@ class MongoResourceManager
         $this->resources[$id]['server'] = (string)$server;
 
         unset($this->resources[$id]['client_instance']);
-        unset($this->resources[$id]['db_instance']);
         unset($this->resources[$id]['collection_instance']);
     }
 
@@ -136,7 +126,6 @@ class MongoResourceManager
         $this->resources[$id]['connection_options'] = $connectionOptions;
 
         unset($this->resources[$id]['client_instance']);
-        unset($this->resources[$id]['db_instance']);
         unset($this->resources[$id]['collection_instance']);
     }
 
@@ -156,7 +145,6 @@ class MongoResourceManager
         $this->resources[$id]['driver_options'] = $driverOptions;
 
         unset($this->resources[$id]['client_instance']);
-        unset($this->resources[$id]['db_instance']);
         unset($this->resources[$id]['collection_instance']);
     }
 
@@ -173,7 +161,6 @@ class MongoResourceManager
     {
         $this->resources[$id]['db'] = (string)$database;
 
-        unset($this->resources[$id]['db_instance']);
         unset($this->resources[$id]['collection_instance']);
     }
 

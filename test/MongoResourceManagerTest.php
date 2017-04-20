@@ -9,7 +9,8 @@
 
 namespace ZendTest\Mongo;
 
-use MongoClient;
+use MongoDB\Client as MongoClient;
+use MongoDB\Collection as MongoCollection;
 use PHPUnit\Framework\TestCase;
 use Zend\Cache\Exception;
 use Zend\Cache\Mongo\MongoResourceManager;
@@ -119,7 +120,7 @@ class MongoResourceManagerTest extends TestCase
         $this->object->setDatabase($id, $database);
         $this->object->setCollection($id, $collection);
 
-        $this->assertInstanceOf('\MongoCollection', $this->object->getResource($id));
+        $this->assertInstanceOf(MongoCollection::class, $this->object->getResource($id));
     }
 
     public function testGetResourceUnknownServerThrowsException()
@@ -135,7 +136,7 @@ class MongoResourceManagerTest extends TestCase
         $this->object->setDatabase($id, $database);
         $this->object->setCollection($id, $collection);
 
-        $this->expectException(Exception\RuntimeException::class);
+        $this->expectException(\MongoDB\Driver\Exception\RuntimeException::class);
         $this->object->getResource($id);
     }
 

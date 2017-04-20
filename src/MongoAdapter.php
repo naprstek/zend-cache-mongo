@@ -9,9 +9,10 @@
 
 namespace Zend\Cache\Mongo;
 
-use MongoCollection;
-use MongoDate;
-use MongoException;
+use MongoDB\Collection as MongoCollection;
+use MongoDB\BSON\UTCDateTime as MongoDate;
+use MongoDB\Model\BSONDocument;
+use MongoDB\Exception\Exception as MongoException;
 use stdClass;
 use Zend\Cache\Exception;
 use Zend\Cache\Storage\Adapter\AbstractAdapter;
@@ -131,7 +132,7 @@ class MongoAdapter extends AbstractAdapter implements FlushableInterface
                 ));
             }
 
-            if ($result['expires']->sec < time()) {
+            if ($result['expires'] < (new MongoDate())) {
                 $this->internalRemoveItem($normalizedKey);
                 return null;
             }
@@ -159,27 +160,24 @@ class MongoAdapter extends AbstractAdapter implements FlushableInterface
         $mongo     = $this->getMongoCollection();
         $key       = $this->namespacePrefix . $normalizedKey;
         $ttl       = $this->getOptions()->getTtl();
-        $expires   = null;
         $cacheItem = [
             'key' => $key,
             'value' => $value,
         ];
 
         if ($ttl > 0) {
-            $expiresMicro         = microtime(true) + $ttl;
-            $expiresSecs          = (int) $expiresMicro;
-            $cacheItem['expires'] = new MongoDate($expiresSecs, $expiresMicro - $expiresSecs);
+            $d = round((microtime(true) + $ttl) * 1000);
+            $cacheItem['expires'] = new MongoDate($d);
         }
 
         try {
-            $mongo->remove(['key' => $key]);
-
-            $result = $mongo->insert($cacheItem);
+            $mongo->deleteOne(['key' => $key]);
+            $result = $mongo->insertOne($cacheItem);
         } catch (MongoException $e) {
             throw new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
 
-        return null !== $result && ((double) 1) === $result['ok'];
+        return null !== $result && $result->isAcknowledged();
     }
 
     /**
@@ -190,14 +188,12 @@ class MongoAdapter extends AbstractAdapter implements FlushableInterface
     protected function internalRemoveItem(& $normalizedKey)
     {
         try {
-            $result = $this->getMongoCollection()->remove(['key' => $this->namespacePrefix . $normalizedKey]);
+            $result = $this->getMongoCollection()->deleteOne(['key' => $this->namespacePrefix . $normalizedKey]);
         } catch (MongoException $e) {
             throw new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
 
-        return false !== $result
-            && ((double) 1) === $result['ok']
-            && $result['n'] > 0;
+        return null !== $result && ($result->getDeletedCount() > 0);
     }
 
     /**
@@ -206,8 +202,7 @@ class MongoAdapter extends AbstractAdapter implements FlushableInterface
     public function flush()
     {
         $result = $this->getMongoCollection()->drop();
-
-        return ((double) 1) === $result['ok'];
+        return ((float) 1) === ($result instanceof BSONDocument ? $result->getArrayCopy()['ok'] : (float) $result->ok);
     }
 
     /**
@@ -229,7 +224,7 @@ class MongoAdapter extends AbstractAdapter implements FlushableInterface
                     'integer'  => true,
                     'double'   => true,
                     'string'   => true,
-                    'array'    => true,
+                    'array'    => false,
                     'object'   => false,
                     'resource' => false,
                 ],
